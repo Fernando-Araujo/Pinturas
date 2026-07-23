@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#10131a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Paint Companion" />
+  <title>Paint Companion</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">PC</div>
+        <div>
+          <strong>Paint Companion</strong>
+          <small>Seu ateliê Warhammer</small>
+        </div>
+      </div>
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-item active" data-view="dashboard">⌂ <span>Início</span></button>
+        <button class="nav-item" data-view="paints">◉ <span>Tintas</span></button>
+        <button class="nav-item" data-view="lab">◌ <span>Laboratório</span></button>
+        <button class="nav-item" data-view="miniatures">♟ <span>Miniaturas</span></button>
+        <button class="nav-item" data-view="armies">⚔ <span>Exércitos</span></button>
+        <button class="nav-item" data-view="settings">⚙ <span>Dados</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="status-dot"></span>
+        <small>Dados salvos neste dispositivo</small>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PAINT COMPANION</p>
+          <h1 id="page-title">Visão geral</h1>
+        </div>
+        <div class="top-actions">
+          <button class="button secondary" id="quick-add-mini">+ Miniatura</button>
+          <button class="button primary" id="quick-add-paint">+ Tinta</button>
+        </div>
+      </header>
+
+      <section class="view active" id="dashboard-view">
+        <div class="hero-card">
+          <div>
+            <span class="pill">MVP pessoal</span>
+            <h2>Seu progresso de pintura em um só lugar.</h2>
+            <p>Organize tintas, receitas, miniaturas e pontos por facção. Tudo funciona offline e fica salvo no iPad.</p>
+          </div>
+          <div class="hero-score">
+            <small>Pontos pintados</small>
+            <strong id="hero-painted-points">0</strong>
+            <span id="hero-painted-percent">0% da coleção</span>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <article class="stat-card"><span>Tintas no estoque</span><strong id="stat-paints">0</strong><small id="stat-low-paints">0 em nível baixo</small></article>
+          <article class="stat-card"><span>Miniaturas</span><strong id="stat-minis">0</strong><small id="stat-painted-minis">0 pintadas</small></article>
+          <article class="stat-card"><span>Pontos totais</span><strong id="stat-total-points">0</strong><small>Somando todas as facções</small></article>
+          <article class="stat-card"><span>Facções</span><strong id="stat-factions">0</strong><small>Com unidades cadastradas</small></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel">
+            <div class="panel-header"><div><p class="eyebrow">PROGRESSO</p><h3>Pipeline de pintura</h3></div></div>
+            <div id="status-bars" class="status-bars"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-header"><div><p class="eyebrow">PRÓXIMOS PASSOS</p><h3>Fila de trabalho</h3></div></div>
+            <div id="work-queue" class="work-queue"></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-header"><div><p class="eyebrow">FACÇÕES</p><h3>Resumo da coleção</h3></div></div>
+          <div id="faction-cards" class="faction-cards"></div>
+        </article>
+      </section>
+
+      <section class="view" id="paints-view">
+        <div class="toolbar">
+          <div class="search-wrap"><input id="paint-search" type="search" placeholder="Buscar por nome, código ou linha..." /></div>
+          <select id="paint-line-filter"><option value="all">Todas as linhas</option></select>
+          <select id="paint-stock-filter"><option value="all">Todo o catálogo</option><option value="owned">Somente meu estoque</option><option value="low">Nível baixo</option></select>
+          <button class="button primary" id="add-paint">+ Adicionar tinta</button>
+        </div>
+        <div id="paint-grid" class="paint-grid"></div>
+      </section>
+
+      <section class="view" id="lab-view">
+        <div class="lab-layout">
+          <article class="panel paint-selector-panel">
+            <div class="panel-header"><div><p class="eyebrow">COR DE PARTIDA</p><h3>Selecione uma tinta</h3></div></div>
+            <select id="lab-paint-select" class="large-select"></select>
+            <div id="selected-paint-preview" class="selected-paint-preview"></div>
+            <div class="panel-header compact"><div><p class="eyebrow">UNDERCOAT</p><h3>Base recomendada</h3></div></div>
+            <div id="undercoat-recommendations" class="recommendation-list"></div>
+          </article>
+
+          <article class="panel color-wheel-panel">
+            <div class="panel-header"><div><p class="eyebrow">ANÁLISE VISUAL</p><h3>Círculo cromático</h3></div></div>
+            <div class="wheel-wrap">
+              <canvas id="color-wheel" width="620" height="620"></canvas>
+              <div id="wheel-center" class="wheel-center"></div>
+            </div>
+            <div class="wheel-legend"><span><i class="legend-dot base"></i>Base</span><span><i class="legend-dot analogous"></i>Análogas</span><span><i class="legend-dot complementary"></i>Complementar</span></div>
+          </article>
+        </div>
+
+        <article class="panel">
+          <div class="panel-header"><div><p class="eyebrow">RECEITA SUGERIDA</p><h3>Sombra, base e luz</h3></div></div>
+          <div id="tone-ramp" class="tone-ramp"></div>
+        </article>
+      </section>
+
+      <section class="view" id="miniatures-view">
+        <div class="toolbar">
+          <div class="search-wrap"><input id="mini-search" type="search" placeholder="Buscar miniatura, unidade ou facção..." /></div>
+          <select id="mini-faction-filter"><option value="all">Todas as facções</option></select>
+          <select id="mini-status-filter"><option value="all">Todos os status</option></select>
+          <button class="button primary" id="add-mini">+ Adicionar miniatura</button>
+        </div>
+        <div id="kanban-board" class="kanban-board"></div>
+      </section>
+
+      <section class="view" id="armies-view">
+        <div class="toolbar">
+          <div>
+            <p class="eyebrow">COLEÇÃO POR FACÇÃO</p>
+            <h2>Exércitos e pontuação</h2>
+          </div>
+          <button class="button primary" id="add-army-mini">+ Adicionar unidade</button>
+        </div>
+        <div id="army-list" class="army-list"></div>
+      </section>
+
+      <section class="view" id="settings-view">
+        <div class="settings-grid">
+          <article class="panel">
+            <div class="panel-header"><div><p class="eyebrow">BACKUP</p><h3>Exportar seus dados</h3></div></div>
+            <p>Gere um arquivo com tintas, miniaturas e configurações para guardar no iCloud Drive.</p>
+            <button class="button primary" id="export-data">Exportar backup</button>
+          </article>
+          <article class="panel">
+            <div class="panel-header"><div><p class="eyebrow">RESTAURAÇÃO</p><h3>Importar backup</h3></div></div>
+            <p>Selecione um arquivo de backup previamente exportado.</p>
+            <label class="button secondary file-button">Importar arquivo<input type="file" id="import-data" accept="application/json" hidden /></label>
+          </article>
+          <article class="panel danger-panel">
+            <div class="panel-header"><div><p class="eyebrow">REINICIAR</p><h3>Limpar dados locais</h3></div></div>
+            <p>Apaga seus registros e restaura os dados de demonstração.</p>
+            <button class="button danger" id="reset-data">Restaurar demonstração</button>
+          </article>
+          <article class="panel">
+            <div class="panel-header"><div><p class="eyebrow">SOBRE O MVP</p><h3>O que já funciona</h3></div></div>
+            <ul class="feature-list">
+              <li>Catálogo inicial Vallejo editável</li>
+              <li>Estoque e nível dos frascos</li>
+              <li>Análise cromática e receita de tons</li>
+              <li>Miniaturas por facção, status e pontos</li>
+              <li>Uso offline e backup em arquivo</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="paint-dialog" class="modal">
+    <form method="dialog" id="paint-form">
+      <div class="modal-header"><div><p class="eyebrow">CATÁLOGO</p><h2>Adicionar tinta</h2></div><button class="icon-button" value="cancel" aria-label="Fechar">×</button></div>
+      <div class="form-grid">
+        <label>Nome<input name="name" required placeholder="Ultramarine Blue" /></label>
+        <label>Código<input name="code" placeholder="72.022" /></label>
+        <label>Linha<input name="line" value="Game Color" /></label>
+        <label>Cor<input name="hex" type="color" value="#3157c8" /></label>
+        <label>Nível<select name="level"><option>Cheio</option><option>Médio</option><option>Baixo</option><option>Vazio</option></select></label>
+        <label class="checkbox-label"><input name="owned" type="checkbox" checked /> Tenho esta tinta</label>
+      </div>
+      <div class="modal-actions"><button class="button secondary" value="cancel">Cancelar</button><button class="button primary" value="default">Salvar tinta</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="mini-dialog" class="modal">
+    <form method="dialog" id="mini-form">
+      <div class="modal-header"><div><p class="eyebrow">COLEÇÃO</p><h2>Adicionar miniatura</h2></div><button class="icon-button" value="cancel" aria-label="Fechar">×</button></div>
+      <div class="form-grid">
+        <label>Nome<input name="name" required placeholder="Captain in Terminator Armour" /></label>
+        <label>Unidade<input name="unit" placeholder="Captain" /></label>
+        <label>Facção<input name="faction" required placeholder="Ultramarines" /></label>
+        <label>Quantidade<input name="quantity" type="number" min="1" value="1" /></label>
+        <label>Pontos<input name="points" type="number" min="0" value="0" /></label>
+        <label>Status<select name="status"></select></label>
+        <label class="full-width">Observações<textarea name="notes" rows="3" placeholder="Receita, montagem, base, magnetização..."></textarea></label>
+      </div>
+      <div class="modal-actions"><button class="button secondary" value="cancel">Cancelar</button><button class="button primary" value="default">Salvar miniatura</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
